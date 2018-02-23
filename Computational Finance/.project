@@ -3,6 +3,7 @@
 	<name>Computational Finance</name>
 	<comment></comment>
 	<projects>
+		<project>finmath lib</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
