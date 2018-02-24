@@ -3,7 +3,7 @@
  *
  * Created on 19.02.2004
  */
-package com.timlummer.InterestDerivatives;
+package Swaption;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.RandomVariable;

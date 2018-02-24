@@ -4,7 +4,7 @@
  * Created on 07.11.2015
  */
 
-package com.timlummer.InterestDerivatives;
+package Swaption;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationInterface;

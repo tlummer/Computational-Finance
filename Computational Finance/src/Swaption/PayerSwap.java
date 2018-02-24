@@ -4,7 +4,7 @@
  * Created on 07.11.2015
  */
 
-package com.timlummer.InterestDerivatives;
+package Swaption;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationInterface;
@@ -15,15 +15,17 @@ import net.finmath.stochastic.RandomVariableInterface;
  * @author Christian Fries
  *
  */
-public class Floater extends AbstractLIBORMonteCarloProduct {
+public class PayerSwap extends AbstractLIBORMonteCarloProduct {
 
 	private final double[]	fixingDates;	// Vector of fixing dates
+	private final double[]	SwapRates;	// Vector of SwapRates
 	private final double[]	paymentDates;	// Vector of payment dates (same length as fixing dates)
 	private final double 	notional;
 
-	public Floater(double[] fixingDates, double[] paymentDates, double notional) {
+	public PayerSwap(double[]	SwapRates, double[] fixingDates, double[] paymentDates, double notional) {
 		
 		super();
+		this.SwapRates = SwapRates;
 		this.fixingDates = fixingDates;
 		this.paymentDates = paymentDates;
 		this.notional=notional;
@@ -42,14 +44,15 @@ public class Floater extends AbstractLIBORMonteCarloProduct {
 			double periodLength = paymentDate-fixingDate;
 
 			// Get floating rate for coupon
-			RandomVariableInterface coupon = model.getLIBOR(fixingDate, fixingDate, paymentDate);
+			RandomVariableInterface libor = model.getLIBOR(fixingDate, fixingDate, paymentDate);
+			RandomVariableInterface SwapRate = model.getRandomVariableForConstant(SwapRates[periodIndex]);
 
-			coupon = coupon.mult(periodLength).mult(notional);
-
+			RandomVariableInterface periodPayoff = libor.sub(SwapRate).mult(periodLength).mult(notional); //.mult(-1.0,) for ReceiverSwap
+			
 			RandomVariableInterface numeraire = model.getNumeraire(paymentDate);
 			RandomVariableInterface monteCarloProbabilities	= model.getMonteCarloWeights(paymentDate);
 
-			value = value.add(coupon.div(numeraire).mult(monteCarloProbabilities));
+			value = value.add(periodPayoff.div(numeraire).mult(monteCarloProbabilities)); 
 		}
 
 		RandomVariableInterface	numeraireAtEvalTime					= model.getNumeraire(evaluationTime);

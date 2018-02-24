@@ -4,7 +4,7 @@
  * Created on 07.11.2015
  */
 
-package com.timlummer.InterestDerivatives;
+package Swaption;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.interestrate.LIBORModelMonteCarloSimulationInterface;
@@ -15,17 +15,19 @@ import net.finmath.stochastic.RandomVariableInterface;
  * @author Christian Fries
  *
  */
-public class Floater extends AbstractLIBORMonteCarloProduct {
+public class FloaterBond extends AbstractLIBORMonteCarloProduct {
 
 	private final double[]	fixingDates;	// Vector of fixing dates
 	private final double[]	paymentDates;	// Vector of payment dates (same length as fixing dates)
+	private final double	maturity;
 	private final double 	notional;
 
-	public Floater(double[] fixingDates, double[] paymentDates, double notional) {
+	public FloaterBond(double[] fixingDates, double[] paymentDates,double maturity, double notional) {
 		
 		super();
 		this.fixingDates = fixingDates;
 		this.paymentDates = paymentDates;
+		this.maturity = maturity;
 		this.notional=notional;
 	
 	}
@@ -51,6 +53,12 @@ public class Floater extends AbstractLIBORMonteCarloProduct {
 
 			value = value.add(coupon.div(numeraire).mult(monteCarloProbabilities));
 		}
+
+		// Add unit notional payment at maturity
+		RandomVariableInterface notionalPayoff = model.getRandomVariableForConstant(notional);
+		RandomVariableInterface numeraire = model.getNumeraire(maturity);
+		RandomVariableInterface monteCarloProbabilities	= model.getMonteCarloWeights(maturity);
+		value = value.add(notionalPayoff.div(numeraire).mult(monteCarloProbabilities));
 
 		RandomVariableInterface	numeraireAtEvalTime					= model.getNumeraire(evaluationTime);
 		RandomVariableInterface	monteCarloProbabilitiesAtEvalTime	= model.getMonteCarloWeights(evaluationTime);

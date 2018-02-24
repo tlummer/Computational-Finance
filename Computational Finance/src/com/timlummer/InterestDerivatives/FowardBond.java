@@ -16,19 +16,14 @@ import net.finmath.stochastic.RandomVariableInterface;
  * @author Christian Fries
  * @version 1.1
  */
-public class CouponBond extends AbstractLIBORMonteCarloProduct {
-	private double [] coupon;
-	private double [] CouponDates;
+public class FowardBond extends AbstractLIBORMonteCarloProduct {
 	private double maturity;
-	
 
     /**
 	 * @param maturity The maturity given as double.
 	 */
-	public CouponBond(double [] coupon, double[] couponDates, double maturity ) {
+	public FowardBond(double fowardstart , double maturity) {
 		super();
-		this.coupon = coupon;
-		this.CouponDates = couponDates;
 		this.maturity = maturity;
 	}
 
@@ -45,34 +40,15 @@ public class CouponBond extends AbstractLIBORMonteCarloProduct {
     @Override
     public RandomVariableInterface getValue(double evaluationTime, LIBORModelMonteCarloSimulationInterface model) throws CalculationException {
 		
-    	
-    	// Initialize 
-    	RandomVariableInterface values = model.getRandomVariableForConstant(0.0);
-    	
-    	for(int i = 0; i<CouponDates.length;i++) {
-    		
-        	// Get random variables
-            RandomVariableInterface	numeraire				= model.getNumeraire(CouponDates[i]);
-            RandomVariableInterface	monteCarloProbabilities	= model.getMonteCarloWeights(CouponDates[i]);
-
-            // Calculate numeraire relative value
-            
-            RandomVariableInterface Coupon = model.getRandomVariableForConstant(coupon[i]).div(numeraire).mult(monteCarloProbabilities);
-            values = values.add(Coupon);         
-    		
-    	}
-    	
-    	
-    	// Get random variables
+		// Get random variables
         RandomVariableInterface	numeraire				= model.getNumeraire(maturity);
         RandomVariableInterface	monteCarloProbabilities	= model.getMonteCarloWeights(maturity);
 
         // Calculate numeraire relative value
-        
-        RandomVariableInterface MaturityPayoff = model.getRandomVariableForConstant(1.0).div(numeraire).mult(monteCarloProbabilities); 
-        values = values.add(MaturityPayoff);
-        
-        
+        RandomVariableInterface values = model.getRandomVariableForConstant(1.0);
+       
+        values = values.div(numeraire).mult(monteCarloProbabilities);
+                
         
         // Convert back to values
         RandomVariableInterface	numeraireAtEvaluationTime				= model.getNumeraire(evaluationTime);

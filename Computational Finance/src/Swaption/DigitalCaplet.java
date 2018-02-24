@@ -3,7 +3,7 @@
  *
  * Created on 06.04.2005
  */
-package com.timlummer.InterestDerivatives;
+package Swaption;
 
 import net.finmath.exception.CalculationException;
 import net.finmath.montecarlo.RandomVariable;
@@ -64,7 +64,7 @@ public class DigitalCaplet extends AbstractLIBORMonteCarloProduct {
 		double	periodLength	= periodEnd - periodStart;
 
         // Get random variables
-		RandomVariableInterface	libor		= model.getLIBOR(periodStart, periodStart, periodEnd);
+		RandomVariableInterface	libor		= model.getLIBOR(optionMaturity, periodStart, periodEnd);
 
 		RandomVariableInterface 			trigger		= libor.sub(strike).mult(periodLength);
 		RandomVariableInterface				values		= (new RandomVariable(1.0)).barrier(trigger, (new RandomVariable(periodLength)), (new RandomVariable(0.0)));
